@@ -31,9 +31,9 @@ IMAGE_DIR.mkdir(exist_ok=True)
 #   t01_smooth_or_features_a02_features_or_disk_frac → P(disk)
 #   t01_smooth_or_features_a03_star_or_artifact_frac → P(artifact/irreg)
 
-SMOOTH_COL   = "t01_smooth_or_features_a01_smooth_frac"
-DISK_COL     = "t01_smooth_or_features_a02_features_or_disk_frac"
-ARTIFACT_COL = "t01_smooth_or_features_a03_star_or_artifact_frac"
+SMOOTH_COL   = "t01_smooth_or_features_a01_smooth_weighted_fraction"
+DISK_COL     = "t01_smooth_or_features_a02_features_or_disk_weighted_fraction"
+ARTIFACT_COL = "t01_smooth_or_features_a03_star_or_artifact_weighted_fraction"
 
 # Only keep galaxies where ≥60 % of voters agree on one class
 CONFIDENCE_THRESHOLD = 0.60
@@ -122,11 +122,11 @@ def prepare_dataset(
     print(df["label"].value_counts().rename({0: "Smooth", 1: "Disk", 2: "Irregular"}))
 
     # Balance classes
-    balanced = (
-        df.groupby("label", group_keys=False)
-        .apply(lambda g: g.sample(min(len(g), max_per_class), random_state=42))
-        .reset_index(drop=True)
-    )
+    balanced_groups = []
+    for label_class, group in df.groupby("label"):
+        sampled = group.sample(min(len(group), max_per_class), random_state=42)
+        balanced_groups.append(sampled)
+    balanced = pd.concat(balanced_groups, ignore_index=True)
     print(f"[prepare] After balancing: {len(balanced):,} galaxies")
 
     # Download images
