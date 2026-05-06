@@ -1,0 +1,11 @@
+{
+  "random_baseline": 0.3333,
+  "baseline_cnn": {
+    "accuracy": 0.8341,
+    "weighted_f1": 0.8317
+  },
+  "resnet18": {
+    "accuracy": 0.9368,
+    "weighted_f1": 0.9384
+  }
+}
